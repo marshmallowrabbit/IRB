@@ -23,9 +23,9 @@ def Analysis(file_name):
     df['y'] = df.apply(lambda row: row.High - row.ca, axis=1)
     df['sl'] = np.where((df['High'].values>df['y'].values) & (df['Close'].values<df['y'].values) & (df['Open'].values<df['y'].values),1,0)
     df['ss'] = np.where((df['Low'].values<df['x'].values) & (df['Close'].values>df['x'].values) & (df['Open'].values>df['x'].values),1,0)
-    df['hc'] = df.apply(lambda row: df['High']-df['Low'],axis=1)
-    df['hcs'] = df.apply(lambda row: abs(df.High-df.Close),axis=1)#.shift(1)
-    df['lcs'] = df.apply(lambda row: abs(df.Low-df.Close),axis=1)
+    df['hc'] = df.High - df.Low
+    df['hcs'] = abs(df.High-df.Close.shift(1))#.shift(1)
+    df['lcs'] = abs(df.Low-df.Close.shift(1))
     df['rt'] = df[['hc','hcs','lcs']].max(axis=1)
     df['slow'] = ta.sma(df['Close'],5)
     df['fast'] = ta.ema(df['Close'],18)
