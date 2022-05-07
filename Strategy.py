@@ -1,5 +1,6 @@
 import ccxt
 import pandas as pd
+import pandas_ta as ta
 import numpy as np
 from datetime import datetime
 import time
