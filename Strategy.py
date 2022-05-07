@@ -6,8 +6,6 @@ from datetime import datetime
 import time
 import sys
 
-
-
 ohlc = 'TEST.csv' #filename
 
 def Analysis(file_name):
@@ -43,6 +41,22 @@ def Analysis(file_name):
     df['longOn'] = np.where((df.slow.values>df.fast.values)&(df['trend 1'].values<df.fast.values)&(df['trend 2'].values<df.fast.values)&(df['trend 3'].values<df.fast.values)&(df['mid'].values<df.fast.values)&(df['low'].values<df.fast.values),1,0)
     df['shortOn'] = np.where((df.slow.values<df.fast.values)&(df['trend 1'].values>df.fast.values)&(df['trend 2'].values>df.fast.values)&(df['trend 3'].values>df.fast.values)&(df['mid'].values>df.fast.values)&(df['low'].values>df.fast.values),1,0)
     return df
-
 print(Analysis(ohlc))
+
+def getSignals(df):
+    print('Getting signals...')
+    Longs = []
+    ExitLongs = []
+    Shorts = []
+    ExitShorts = []
+    for i in range(len(df)):
+        if 'yes' in df['longOn'].iloc[i] and 'NaN' in df['longOn'].iloc[i-1]:
+            if df['High']>df['longlimit']:
+                Longs.append(df.iloc[i].name)
+    for i in range(len(df)):
+        if 'yes' in df['shortOn'].iloc[i] and 'NaN' in df['shortOn'].iloc[i-1]:
+            if df['Low']>df['shortlimit']:
+                Shorts.append(df.iloc[i].name)
+    return Longs,Shorts
+print(getSignals(Analysis(ohlc)))
 
