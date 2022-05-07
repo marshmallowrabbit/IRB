@@ -23,6 +23,12 @@ def Analysis(file_name):
     df['y'] = df.apply(lambda row: row.High - row.ca, axis=1)
     df['sl'] = np.where((df['High'].values>df['y'].values) & (df['Close'].values<df['y'].values) & (df['Open'].values<df['y'].values),1,0)
     df['ss'] = np.where((df['Low'].values<df['x'].values) & (df['Close'].values>df['x'].values) & (df['Open'].values>df['x'].values),1,0)
+    df['longlimit'] = np.where((df['sl'] > 0), df['High'].values,np.NaN)
+    df['longlimit'] = df['longlimit'].ffill()
+    df['longlimit'] = np.array(df['longlimit']).tolist()
+    df['shortlimit'] = np.where((df['ss'] > 0), df['Low'].values,np.NaN)
+    df['shortlimit'] = df['shortlimit'].ffill()
+    df['shortlimit'] = np.array(df['shortlimit']).tolist()
     df['hc'] = df.High - df.Low
     df['hcs'] = abs(df.High-df.Close.shift(1))
     df['lcs'] = abs(df.Low-df.Close.shift(1))
