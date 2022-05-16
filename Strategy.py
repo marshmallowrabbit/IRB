@@ -37,26 +37,42 @@ def Analysis(file_name):
     df['trend 2'] = ta.sma(df['Close'],89)
     df['trend 3'] = ta.ema(df['Close'],144)
     df['mid'] = ta.ema(df['Close'],35)
-    df['low'] = ta.ema(df['Close'],35) + 0.5*(ta.rma(df['rt'],35))
-    df['longOn'] = np.where((df.slow.values>df.fast.values)&(df['trend 1'].values<df.fast.values)&(df['trend 2'].values<df.fast.values)&(df['trend 3'].values<df.fast.values)&(df['mid'].values<df.fast.values)&(df['low'].values<df.fast.values),1,0)
-    df['shortOn'] = np.where((df.slow.values<df.fast.values)&(df['trend 1'].values>df.fast.values)&(df['trend 2'].values>df.fast.values)&(df['trend 3'].values>df.fast.values)&(df['mid'].values>df.fast.values)&(df['low'].values>df.fast.values),1,0)
+    df['lower'] = ta.ema(df['Close'],35) + 0.5*(ta.rma(df['rt'],35))
+    df['longOn'] = np.where((df.slow.values>df.fast.values)&(df['trend 1'].values<df.fast.values)&(df['trend 2'].values<df.fast.values)&(df['trend 3'].values<df.fast.values)&(df['mid'].values<df.fast.values)&(df['lower'].values<df.fast.values),'y','n')
+    df['shortOn'] = np.where((df.slow.values<df.fast.values)&(df['trend 1'].values>df.fast.values)&(df['trend 2'].values>df.fast.values)&(df['trend 3'].values>df.fast.values)&(df['mid'].values>df.fast.values)&(df['lower'].values>df.fast.values),'y','n')
+    df['longstop'] = np.where((df['slow'].values>df['Low'].values),df['fast'].values,df['slow'].values)
+    df['shortstop'] = np.where((df['slow'].values<df['High'].values),df['fast'].values,df['slow'].values)
+    df['longtarget'] = df.apply(lambda row: abs((row.longstop / row.longlimit) - 1)*riskratio, axis=1)
+    df['longtarget'] = df.apply(lambda row: (row.longlimit * (row.longtarget + 1)), axis=1)
+    df['shorttarget'] = df.apply(lambda row: abs((row.shortstop / row.shortlimit) - 1)*riskratio, axis=1)
+    df['shorttarget'] = df.apply(lambda row: (row.shortlimit * (1 - row.shorttarget)), axis=1)
+    pd.set_option('display.max_rows', df.shape[0]+1)
+    pd.set_option('display.max_columns',df.shape[0]+1)
     return df
-print(Analysis(ohlc))
+
+# print(Analysis(ohlc))
 
 def getSignals(df):
     print('Getting signals...')
     Longs = []
-    ExitLongs = []
     Shorts = []
+    ExitLongs = []
     ExitShorts = []
+    maxLen = 50
     for i in range(len(df)):
-        if 'yes' in df['longOn'].iloc[i] and 'NaN' in df['longOn'].iloc[i-1]:
+        if 'y' in df['longOn'].iloc[i] and 'n' in df['longOn'].iloc[i-1]:
             if df['High']>df['longlimit']:
                 Longs.append(df.iloc[i].name)
+                for j in maxLen:
+                    if (df['High'].iloc[i+j]>df['longtarget'].iloc[i+j]) or (df['Low'].iloc[i+j]<df['longstop'].iloc[i+j]):
+                        ExitLongs.append(df.iloc[i+j].name)
     for i in range(len(df)):
-        if 'yes' in df['shortOn'].iloc[i] and 'NaN' in df['shortOn'].iloc[i-1]:
+        if 'y' in df['shortOn'].iloc[i] and 'n' in df['shortOn'].iloc[i-1]:
             if df['Low']>df['shortlimit']:
                 Shorts.append(df.iloc[i].name)
-    return Longs,Shorts
+                for j in maxLen:
+                    if (df['High'].iloc[i+j]>df['shortstop'].iloc[i+j]) or (df['Low'].iloc[i+j]<df['shortlimit'].iloc[i+j]):
+                        ExitShorts.append(df.iloc[i+j].name)
+    return Longs,Shorts,ExitLongs,ExitShorts
 print(getSignals(Analysis(ohlc)))
 
