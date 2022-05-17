@@ -1,5 +1,7 @@
 ccxt
 pandas
 pandas-ta
-numpy
+numpy==1.21
 matplotlib
+vectorbt==0.23.2
+kaleido
