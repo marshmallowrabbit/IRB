@@ -16,15 +16,13 @@ def Split(file_name, timeframe, pct_opt, sample_length, shift_by):
     # timeframe
     # pct_opt
     # sample_length
-    shift_candles = shift_by*sample_length
+    shift_candles = round(shift_by*sample_length)
     n=0
     header = ['Timestamp', 'Open', 'High', 'Low', 'Close']
     for i in range(1,frame_lenth,shift_candles):
         n += 1
-        frame = pd.read_csv(file_name,columns=header,nrows=sample_length,skiprows=i)
+        frame = pd.read_csv(file_name,names=header,nrows=sample_length,skiprows=i)
         sample_csv_name = str(n) + '.csv'
-        frame.to_csv(sample_csv_name,index=False,mode='a',chunksize=sample_length)
+        frame.to_csv(sample_csv_name,columns=header,index=False,mode='a',chunksize=sample_length)#
 
 Split(ohlc,tf,PO,sl,shift)
-    
-    
