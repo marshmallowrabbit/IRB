@@ -78,3 +78,8 @@ def getSignals(df):
     return Longs,Shorts,ExitLongs,ExitShorts
 print(getSignals(Analysis(ohlc)))
 
+def Plot(ohlc,Longs,Shorts,ExitLongs,ExitShorts):
+    plt.figure(figsize=(12,5))
+    plt.scatter(ohlc.loc[Longs].index, ohlc.loc[Longs]['Close'], marker='^')
+    plt.plot(ohlc['Close'], alpha=0.7)
+
