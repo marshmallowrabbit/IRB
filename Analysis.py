@@ -46,6 +46,8 @@ def Analysis(file_name):
     df['longtarget'] = df.apply(lambda row: (row.longlimit * (row.longtarget + 1)), axis=1)
     df['shorttarget'] = df.apply(lambda row: abs((row.shortstop / row.shortlimit) - 1)*riskratio, axis=1)
     df['shorttarget'] = df.apply(lambda row: (row.shortlimit * (1 - row.shorttarget)), axis=1)
+    df['longOff'] = np.where((df.high.values>df.longtarget.values) or (df.low.values<df.longstop.values),'y','n')
+    df['shortOff'] = np.where((df.low.values<df.shorttarget.values) or (df.high.values>df.shortstop.values),'y','n')
     pd.set_option('display.max_rows', df.shape[0]+1)
     pd.set_option('display.max_columns',df.shape[0]+1)
     return df
