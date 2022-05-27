@@ -1,4 +1,6 @@
 import pandas as pd
+import numpy as np
+import pandas_ta as ta
 import os
 import matplotlib.pyplot as plt
 
@@ -12,36 +14,47 @@ def recallNum(data_file,number):
             df = pd.read_csv(data_file+'/'+'BTC'+str(number)+'.csv')
     return df
   
-def visualise(df):
-    #create figure
-    plt.figure()
-
-    #define width of candlestick elements
-    width = .4
-    width2 = .05
-
-    #define up and down prices
-    up = df[df.Close>=df.Open]
-    down = df[df.Close<df.Open]
-
-    #define colors to use
-    col1 = 'green'
-    col2 = 'red'
-
-    #plot up prices
-    plt.bar(up.Index,up.Close-up.Open,width,bottom=up.Open,color=col1)
-    plt.bar(up.Index,up.High-up.Close,width2,bottom=up.Close,color=col1)
-    plt.bar(up.Index,up.Low-up.Open,width2,bottom=up.Open,color=col1)
-
-    #plot down prices
-    plt.bar(down.Index,down.Close-down.Open,width,bottom=down.Open,color=col2)
-    plt.bar(down.Index,down.High-down.Open,width2,bottom=down.Open,color=col2)
-    plt.bar(down.Index,down.Low-down.Close,width2,bottom=down.Close,color=col2)
-
-    #rotate x-axis tick labels
-    plt.xticks(rotation=45, ha='right')
-
-    #display candlestick chart
-    plt.show()
-    
+def Analysis(df):
+    c = 45/100
+    riskratio = 1.5
+    print('Analyzing...')
+    df = pd.read_csv(file_name)
+    df['a'] = abs(df.apply(lambda row: row.High - row.Low, axis=1))
+    df['b'] = abs(df.apply(lambda row: row.Close - row.Open, axis=1))
+    df['ca'] = df.apply(lambda row: row.a * c, axis=1)
+    df['rv'] = np.where(df['b'].values < df['ca'].values,1,0)
+    df['x'] = df.apply(lambda row: row.Low + row.ca, axis=1)
+    df['y'] = df.apply(lambda row: row.High - row.ca, axis=1)
+    df['sl'] = np.where((df['High'].values>df['y'].values) & (df['Close'].values<df['y'].values) &(df['Open'].values<df['y'].values),1,0)
+    df['ss'] = np.where((df['Low'].values<df['x'].values) & (df['Close'].values>df['x'].values) & (df['Open'].values>df['x'].values),1,0)
+    df['longlimit'] = np.where((df['sl'] > 0), df['High'].values,np.NaN)
+    df['longlimit'] = df['longlimit'].ffill()
+    df['longlimit'] = np.array(df['longlimit']).tolist()
+    df['shortlimit'] = np.where((df['ss'] > 0), df['Low'].values,np.NaN)
+    df['shortlimit'] = df['shortlimit'].ffill()
+    df['shortlimit'] = np.array(df['shortlimit']).tolist()
+    df['hc'] = df.High - df.Low
+    df['hcs'] = abs(df.High-df.Close.shift(1))
+    df['lcs'] = abs(df.Low-df.Close.shift(1))
+    df['rt'] = df[['hc','hcs','lcs']].max(axis=1)
+    df['slow'] = ta.sma(df['Close'],5)
+    df['fast'] = ta.ema(df['Close'],18)
+    df['trend 1'] = ta.sma(df['Close'],50)
+    df['trend 2'] = ta.sma(df['Close'],89)
+    df['trend 3'] = ta.ema(df['Close'],144)
+    df['mid'] = ta.ema(df['Close'],35)
+    df['lower'] = ta.ema(df['Close'],35) + 0.5*(ta.rma(df['rt'],35))
+    df['longOn'] = np.where((df.slow.values>df.fast.values)&(df['trend 1'].values<df.fast.values)&(df['trend 2'].values<df.fast.values)&(df['trend 3'].values<df.fast.values)&(df['mid'].values<df.fast.values)&(df['lower'].values<df.fast.values),'y','n')
+    df['shortOn'] = np.where((df.slow.values<df.fast.values)&(df['trend 1'].values>df.fast.values)&(df['trend 2'].values>df.fast.values)&(df['trend 3'].values>df.fast.values)&(df['mid'].values>df.fast.values)&(df['lower'].values>df.fast.values),'y','n')
+    df['longstop'] = np.where((df['slow'].values>df['Low'].values),df['fast'].values,df['slow'].values)
+    df['shortstop'] = np.where((df['slow'].values<df['High'].values),df['fast'].values,df['slow'].values)
+    df['longtarget'] = df.apply(lambda row: abs((row.longstop / row.longlimit) - 1)*riskratio, axis=1)
+    df['longtarget'] = df.apply(lambda row: (row.longlimit * (row.longtarget + 1)), axis=1)
+    df['shorttarget'] = df.apply(lambda row: abs((row.shortstop / row.shortlimit) - 1)*riskratio, axis=1)
+    df['shorttarget'] = df.apply(lambda row: (row.shortlimit * (1 - row.shorttarget)), axis=1)
+    df['longOff'] = np.where((df.high.values>df.longtarget.values) or (df.low.values<df.longstop.values),'y','n')
+    df['shortOff'] = np.where((df.low.values<df.shorttarget.values) or (df.high.values>df.shortstop.values),'y','n')
+    pd.set_option('display.max_rows', df.shape[0]+1)
+    pd.set_option('display.max_columns',df.shape[0]+1)
+    return df
 
