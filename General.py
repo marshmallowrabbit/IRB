@@ -14,7 +14,7 @@ def recallNum(data_file,number):
             df = pd.read_csv(data_file+'/'+'BTC'+str(number)+'.csv')
     return df
   
-def RandS(data_file,number,opt_ratio)
+def RandS(data_file,number,opt_ratio):
     data_list=[]
     name=str[0:3]
     for file in os.listdir(data_file):
