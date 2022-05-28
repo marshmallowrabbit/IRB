@@ -16,7 +16,8 @@ def recallNum(data_file,number):
   
 def RandS(data_file,number,opt_ratio):
     data_list=[]
-    name=str[0:3]
+    name=str(data_file[0:3])
+    header = ['Timestamp', 'Open', 'High', 'Low', 'Close']
     for file in os.listdir(data_file):
         if file.endswith('.csv'):
             data_list.append(file)
@@ -27,7 +28,7 @@ def RandS(data_file,number,opt_ratio):
             sample_length = len(df)
             in_sample_length = round(sample_length*opt_ratio)
             in_sample = pd.read_csv(file_string,nrows=in_sample_length)
-            out_of_sample = pd.read_csv(file_string,skiprows=in_sample_length)
+            out_of_sample = pd.read_csv(file_string,names=header,skiprows=in_sample_length)
     return in_sample, out_of_sample
 
 
