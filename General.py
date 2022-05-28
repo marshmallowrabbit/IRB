@@ -14,6 +14,23 @@ def recallNum(data_file,number):
             df = pd.read_csv(data_file+'/'+'BTC'+str(number)+'.csv')
     return df
   
+def RandS(data_file,number,opt_ratio)
+    data_list=[]
+    name=str[0:3]
+    for file in os.listdir(data_file):
+        if file.endswith('.csv'):
+            data_list.append(file)
+    for file in data_list:
+        if str(number) in file:
+            file_string = data_file+'/'+name+str(number)+'.csv'
+            df = pd.read_csv(file_string)
+            sample_length = len(df)
+            in_sample_length = round(sample_length*opt_ratio)
+            in_sample = pd.read_csv(file_string,nrows=in_sample_length)
+            out_of_sample = pd.read_csv(file_string,skiprows=in_sample_length)
+    return in_sample, out_of_sample
+
+
 def Analysis(df):
     c = 45/100
     riskratio = 1.5
