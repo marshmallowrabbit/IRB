@@ -21,8 +21,6 @@ def signals(df):
 def signals(df):
     Longs = []
     ExitLongs = []
-    # temp_long_stop = []
-    # temp_long_target = []
     temp_long_stop = 0
     temp_long_target = 0
     for i in range(len(df)):
