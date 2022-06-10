@@ -26,8 +26,8 @@ def signals(df):
     for i in range(len(df)):
         if 'y' in df['shortOn'].iloc[i] and 'n' in df['shortOn'].iloc[i-1] and df['Low'].iloc[i]<df['shortlimit'].iloc[i]:
             Shorts.append(df.iloc[i].name)
-            temp_shortstop = df.iloc[i].longstop
-            temp_shorttarget = df.iloc[i].longtarget
+            temp_shortstop = df.iloc[i].shortstop
+            temp_shorttarget = df.iloc[i].shorttarget
             for j in range(len(df)-i):
                 if df['Low'].iloc[i+j]<temp_shorttarget:
                     Short_wins.append(df.iloc[i+j].name)
