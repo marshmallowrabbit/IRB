@@ -43,13 +43,5 @@ Order(symbol,order_type,order_side,amount,price,stop_price,takeProfit_price)
 #     'pegOffsetValueEp': 10000, # needs to be scaled
 #     'triggerType': 'ByMarkPrice'
 #     })
-
-
-
-# def Order(trade_type,limit_price,stop_price,target_price):
-#     ftx.createOrder()
-#     ftx.createStopLimitOrder()
-#     ftx.createStopOrder()
-#     params = {}
 #     setLeverage (leverage, symbol = undefined, params = {})
 
