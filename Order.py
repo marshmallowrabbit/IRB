@@ -11,16 +11,26 @@ ftx = ccxt.ftx({
 ftx.load_markets()
 
 symbol = 'ETH-PERP'
-type = 'limit'
-side = 'buy'
+type_1 = 'limit'
+type_2 = 'StopLimit'
+type_3 = 'TakeProfitLimit'
+side_1 = 'buy'
+side_2 = 'sell'
 amount = 0.004
-price = 1200
-params = {
-    'stopPrice': 1150,
-    # 'ordType': 'StopLimit',
-    'takeProfit':1300
-}
-order = ftx.create_order(symbol, type, side, amount, price, params)
+price = 1206
+stop_price = 1200
+takeProfit_price = 1212
+order = ftx.create_order(symbol, type_1, side_1, amount, price)
+stoploss = ftx.create_order(symbol, type_2, side_2, amount, stop_price, params = {
+    'stopPrice': stop_price,
+    'ordType': 'StopLimit'
+    })
+takeprofit = ftx.create_order(symbol, type_3, side_2, amount, takeProfit_price, params = {
+    'takeProfitPrice': takeProfit_price,
+    'ordType': 'TakeProfitLimit'
+    })
+
+# THIS CODE RESULTS IN A STOP LOSS AND TAKE PROFIT TRIGGER ORDER HOWEVER, IF STOPLOSS IS TRIGGERED THEN TAKEPROFIT REMAINS AND VICE-VERSA
 
 
 # ethPrice = 1000
