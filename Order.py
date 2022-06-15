@@ -7,7 +7,7 @@ ftx = ccxt.ftx({
         "FTX-SUBACCOUNT": "TestAccount"
     }
 })
-
+# limit long with stop loss and take profit
 symbol = 'ETH-PERP'
 order_type = 'limit'
 # type_2 = 'StopLimit'
