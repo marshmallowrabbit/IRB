@@ -31,6 +31,11 @@ def Order(symbol,order_type,order_side,amount,price,stop_limit,target_limit):
 
 Order(symbol,order_type,order_side,amount,price,stop_price,takeProfit_price)
 
+positions = ftx.private_get_positions()
+# positions_json = json.loads(positions)
+print(positions)
+
+
 # THIS CODE RESULTS IN A STOP LOSS AND TAKE PROFIT TRIGGER ORDER HOWEVER, IF STOPLOSS IS TRIGGERED THEN TAKEPROFIT REMAINS AND VICE-VERSA
 
 
