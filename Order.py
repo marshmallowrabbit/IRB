@@ -1,5 +1,4 @@
 import ccxt
-import json
 
 ftx = ccxt.ftx({
     "apiKey": 'YniG9SrlPZ63G47h9sN3hjH-Zjq6hctrkgbdnNF_',
@@ -33,8 +32,10 @@ def Order(symbol,order_type,order_side,amount,price,stop_limit,target_limit):
 # Order(symbol,order_type,order_side,amount,price,stop_price,takeProfit_price)
 
 positions = ftx.private_get_positions()
-print(positions['result'])
-
+result = positions['result']
+position_result= result[0]
+position_size = position_result['size']
+print(position_size)
 
 # THIS CODE RESULTS IN A STOP LOSS AND TAKE PROFIT TRIGGER ORDER HOWEVER, IF STOPLOSS IS TRIGGERED THEN TAKEPROFIT REMAINS AND VICE-VERSA
 
