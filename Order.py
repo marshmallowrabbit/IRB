@@ -22,13 +22,21 @@ takeProfit_price = 1280
 
 def Order(symbol,order_type,order_side,amount,price,stop_limit,target_limit):
     ftx.load_markets()
-    ftx.cancel_all_orders(symbol,params={'conditionalOrdersOnly': True})
-    ftx.cancel_all_orders(symbol)
+    positions = ftx.private_get_positions()
+    result = positions['result']
+    position_result= result[0]
+    position_size = float(position_result['size'])
+    position_future = position_result['future']
+    if position_size == 0:
+        # ftx.cancel_all_orders(symbol,params={'conditionalOrdersOnly': True})
+        ftx.cancel_all_orders(symbol)
+        order = ftx.create_order(symbol, type = order_type, side = order_side, amount = amount, price = price)
+        stoploss = ftx.create_order(symbol, type = 'StopLimit', side = 'sell', amount = amount, price = stop_price, params = {'stopPrice': stop_price,'ordType': 'StopLimit'})
+        takeprofit = ftx.create_order(symbol, type = 'TakeProfitLimit', side = 'sell', amount = amount, price = takeProfit_price, params = {'takeProfitPrice': takeProfit_price,'ordType': 'TakeProfitLimit'})
+    else:
+        print(symbol + ' Has Existing Position - Order Function Unsuccessful')
+        pass
     
-    order = ftx.create_order(symbol, type = order_type, side = order_side, amount = amount, price = price)
-    stoploss = ftx.create_order(symbol, type = 'StopLimit', side = 'sell', amount = amount, price = stop_price, params = {'stopPrice': stop_price,'ordType': 'StopLimit'})
-    takeprofit = ftx.create_order(symbol, type = 'TakeProfitLimit', side = 'sell', amount = amount, price = takeProfit_price, params = {'takeProfitPrice': takeProfit_price,'ordType': 'TakeProfitLimit'})
-
 # Order(symbol,order_type,order_side,amount,price,stop_price,takeProfit_price)
 
 positions = ftx.private_get_positions()
