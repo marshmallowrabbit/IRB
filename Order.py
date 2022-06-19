@@ -12,12 +12,12 @@ symbol = 'ETH-PERP'
 order_type = 'limit'
 # type_2 = 'StopLimit'
 # type_3 = 'TakeProfitLimit'
-order_side = 'buy'
+order_side = 'sell'
 # side_2 = 'sell'
 amount = 0.004
-price = 1082
-stop_price = 1000
-takeProfit_price = 1280
+price = 995
+stop_price = 1080
+takeProfit_price = 900
 
 
 def Order(symbol,order_type,order_side,amount,price,stop_limit,target_limit):
@@ -27,17 +27,22 @@ def Order(symbol,order_type,order_side,amount,price,stop_limit,target_limit):
     position_result= result[0]
     position_size = float(position_result['size'])
     position_future = position_result['future']
-    if position_size == 0:
+    trigger_side = 'none'
+    if order_side == 'buy':
+        trigger_side = 'sell'
+    elif order_side == 'sell':
+        trigger_side = 'buy'
+    if position_size == 0 and position_future == symbol:
         # ftx.cancel_all_orders(symbol,params={'conditionalOrdersOnly': True})
         ftx.cancel_all_orders(symbol)
         order = ftx.create_order(symbol, type = order_type, side = order_side, amount = amount, price = price)
-        stoploss = ftx.create_order(symbol, type = 'StopLimit', side = 'sell', amount = amount, price = stop_price, params = {'stopPrice': stop_price,'ordType': 'StopLimit'})
-        takeprofit = ftx.create_order(symbol, type = 'TakeProfitLimit', side = 'sell', amount = amount, price = takeProfit_price, params = {'takeProfitPrice': takeProfit_price,'ordType': 'TakeProfitLimit'})
+        stoploss = ftx.create_order(symbol, type = 'StopLimit', side = trigger_side, amount = amount, price = stop_price, params = {'stopPrice': stop_price,'ordType': 'StopLimit'})
+        takeprofit = ftx.create_order(symbol, type = 'TakeProfitLimit', side = trigger_side, amount = amount, price = takeProfit_price, params = {'takeProfitPrice': takeProfit_price,'ordType': 'TakeProfitLimit'})
     else:
         print(symbol + ' Has Existing Position - Order Function Unsuccessful')
         pass
     
-# Order(symbol,order_type,order_side,amount,price,stop_price,takeProfit_price)
+Order(symbol,order_type,order_side,amount,price,stop_price,takeProfit_price)
 
 positions = ftx.private_get_positions()
 result = positions['result']
