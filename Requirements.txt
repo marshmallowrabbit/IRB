@@ -3,3 +3,4 @@ pandas
 pandas-ta
 numpy==1.21
 matplotlib
+flask_ngrok
